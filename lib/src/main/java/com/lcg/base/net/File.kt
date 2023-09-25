@@ -19,8 +19,9 @@ import kotlin.coroutines.coroutineContext
 /**文件上传*/
 suspend inline fun <reified T> upload(
     path: String,
-    paramsMap: HashMap<String, Any?>? = null
-): T = request(path, object : JsonResponseHandler<T>() {}) {
+    paramsMap: HashMap<String, Any?>? = null,
+    noinline fail: ((Int, Throwable) -> Boolean)? = null
+): T? = request(path, object : JsonResponseHandler<T>() {}, fail) {
     val builder = MultipartBody.Builder()
     //设置类型
     builder.setType(MultipartBody.FORM)
@@ -49,8 +50,9 @@ suspend inline fun <reified T> upload(
 suspend fun download(
     path: String,
     file: File = File(Core.context!!.cacheDir, MD5.GetMD5Code(path)),
-    progress: ((Long, Long) -> Unit)? = null
-): File {
+    progress: ((Long, Long) -> Unit)? = null,
+    fail: ((Int, Throwable, File) -> Boolean)? = null
+): File? {
     val handler = if (progress == null) {
         DownloadHandler(file)
     } else {
@@ -61,10 +63,14 @@ suspend fun download(
             }
         }
     }
-    request(path, handler) {
+    val f = if (fail == null) {
+        null
+    } else {
+        fun(code: Int, e: Throwable) = fail(code, e, file)
+    }
+    return request(path, handler, f) {
         it.addHeader("RANGE", "bytes=" + file.length() + "-")
         it.addHeader("Connection", "keep-alive")
         it.get()
     }
-    return file
 }

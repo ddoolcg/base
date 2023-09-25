@@ -7,6 +7,7 @@ import com.lcg.base.MD5
 import com.lcg.base.net.DownloadHandler
 import com.lcg.base.net.JsonResponseHandler
 import com.lcg.base.net.httpHandle
+import com.lcg.base.net.requestUnmodified
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -81,7 +82,7 @@ fun Loading?.download(
             trySend(loadSize to total)
         }
         this@download?.show(coroutineContext[Job])
-        com.lcg.base.net.request(path, handler) {
+        requestUnmodified(path, handler) {
             it.addHeader("RANGE", "bytes=" + file.length() + "-")
             it.addHeader("Connection", "keep-alive")
             it.get()

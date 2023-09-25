@@ -44,17 +44,17 @@ Core.activityDestroyed(this)
 # 联网调用
 
 ~~~kotlin
-// 面向对象风格
+// 面向对象风格，可选方法：*Body、join、style、catchFail
 HttpUrl("完整url|相对host的路径").get<T> { TODO() }
 // flow风格
 val flow: Flow<T> = Loading?.get<T>("完整url|相对host的路径")
 TODO()
 // 协程风格
-launch(httpThrowableHandler) {
-    isLoading = true
-    val date: T = com.lcg.base.net.get<T>("完整url|相对host的路径")
+launch {
+    // isLoading = true
+    val date: T? = com.lcg.base.net.get<T>("完整url|相对host的路径")
     TODO()
-    isLoading = false
+    // isLoading = false
 }
 ~~~
 

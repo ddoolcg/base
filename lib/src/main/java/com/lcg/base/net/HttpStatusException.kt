@@ -6,4 +6,4 @@ package com.lcg.base.net
  * @author lei.chuguang Email:475825657@qq.com
  */
 class HttpStatusException(val code: Int, val info: String? = "服务器繁忙") :
-    Throwable("$info code=$code")
+    Exception("$info code=$code")

@@ -45,7 +45,7 @@ Core.activityDestroyed(this)
 
 ~~~kotlin
 // 面向对象风格
-HttpUrl("完整url|相对host的路径").join(Loading).formBody(map).post<T> { TODO() }
+HttpUrl("完整url|相对host的路径").get<T> { TODO() }
 // flow风格
 val flow: Flow<T> = Loading?.get<T>("完整url|相对host的路径")
 TODO()

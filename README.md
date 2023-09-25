@@ -19,7 +19,7 @@ allprojects {
 
 ~~~gradle
 dependencies {
-    api 'com.gitee.leicg:base:0.1'
+    api 'com.gitee.leicg:base:0.3'
 }
 ~~~
 
@@ -31,7 +31,7 @@ Core.init(this)
         TODO()
     }// 初始化http host和统一的接口异常处理
     .initToken {
-        TODO()
+        TODO("认证失败请求认证")
     }//网络请求token认证
     .setDebug(true)//debug日志打印
     .setCrashURL(url)// 异常上报地址
@@ -48,10 +48,9 @@ Core.activityDestroyed(this)
 HttpUrl("完整url|相对host的路径").join(Loading).formBody(map).post<T> { TODO() }
 // flow风格
 val flow: Flow<T> = Loading?.get<T>("完整url|相对host的路径")
+TODO()
 // 协程风格
-val handler =
-    CoroutineExceptionHandler { _, throwable -> throwable.httpHandle() }
-launch(handler) {
+launch(httpThrowableHandler) {
     isLoading = true
     val date: T = com.lcg.base.net.get<T>("完整url|相对host的路径")
     TODO()

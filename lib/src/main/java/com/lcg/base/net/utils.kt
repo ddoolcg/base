@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONException
 import com.lcg.base.L
 import com.lcg.base.showToast
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,36 +25,28 @@ suspend fun <T> request(
 //region 四大请求：协程风格
 /**get*/
 suspend inline fun <reified T> get(
-    path: String,
-    paramsMap: HashMap<String, String?>? = null,
-    style: Http.Style = Http.defaultStyle
+    path: String, paramsMap: HashMap<String, String?>? = null, style: Http.Style = Http.defaultStyle
 ): T = request(urlJoint(path, paramsMap), object : JsonResponseHandler<T>(style) {}) {
     it.get()
 }
 
 /**delete*/
 suspend inline fun <reified T> delete(
-    path: String,
-    paramsMap: HashMap<String, String?>? = null,
-    style: Http.Style = Http.defaultStyle
+    path: String, paramsMap: HashMap<String, String?>? = null, style: Http.Style = Http.defaultStyle
 ): T = request(urlJoint(path, paramsMap), object : JsonResponseHandler<T>(style) {}) {
     it.delete()
 }
 
 /**post*/
 suspend inline fun <reified T> post(
-    path: String,
-    json: String,
-    style: Http.Style = Http.defaultStyle
+    path: String, json: String, style: Http.Style = Http.defaultStyle
 ): T = request(path, object : JsonResponseHandler<T>(style) {}) {
     it.post(json.toRequestBody("application/json".toMediaType()))
 }
 
 /**post*/
 suspend inline fun <reified T> post(
-    path: String,
-    paramsMap: HashMap<String, String?>? = null,
-    style: Http.Style = Http.defaultStyle
+    path: String, paramsMap: HashMap<String, String?>? = null, style: Http.Style = Http.defaultStyle
 ): T = request(path, object : JsonResponseHandler<T>(style) {}) {
     val f = FormBody.Builder()
     paramsMap?.forEach { (t, u) ->
@@ -64,18 +57,14 @@ suspend inline fun <reified T> post(
 
 /**put*/
 suspend inline fun <reified T> put(
-    path: String,
-    json: String,
-    style: Http.Style = Http.defaultStyle
+    path: String, json: String, style: Http.Style = Http.defaultStyle
 ): T = request(path, object : JsonResponseHandler<T>(style) {}) {
     it.put(json.toRequestBody("application/json".toMediaType()))
 }
 
 /**put*/
 suspend inline fun <reified T> put(
-    path: String,
-    paramsMap: HashMap<String, String?>? = null,
-    style: Http.Style = Http.defaultStyle
+    path: String, paramsMap: HashMap<String, String?>? = null, style: Http.Style = Http.defaultStyle
 ): T = request(path, object : JsonResponseHandler<T>(style) {}) {
     val f = FormBody.Builder()
     paramsMap?.forEach { (t, u) ->
@@ -98,6 +87,9 @@ fun urlJoint(url: String, paramsMap: HashMap<String, String?>?): String {
     }
 }
 
+/**处理http异常*/
+val httpThrowableHandler by lazy { CoroutineExceptionHandler { _, throwable -> throwable.httpHandle() } }
+
 /**http异常处理*/
 fun Throwable.httpHandle(handler: ((Int, Throwable) -> Boolean)? = null) {
     if (L.DEBUG) printStackTrace()
@@ -116,7 +108,7 @@ fun Throwable.httpHandle(handler: ((Int, Throwable) -> Boolean)? = null) {
             when (code) {
                 403 -> "禁止该请求"
                 404 -> "该请求不存在"
-                else -> "${this.message}:${this.code}"
+                else -> "${this.info}:${this.code}"
             }
         }
 

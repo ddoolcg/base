@@ -30,10 +30,6 @@ open class HttpUrl(val path: String) {
     var style = Http.defaultStyle
         private set
 
-    /**异常处理器*/
-    val exceptionHandler =
-        CoroutineExceptionHandler { _, throwable -> throwable.httpHandle(fail) }
-
     /**html表单方式请求*/
     fun formBody(formMap: HashMap<String, String?>?): HttpUrl {
         this.body = null
@@ -86,7 +82,7 @@ open class HttpUrl(val path: String) {
         scope: CoroutineScope = MainScope(),
         crossinline success: (data: T) -> Unit
     ) = launch(scope, success) {
-        get(path, formMap, style)
+        get(path, formMap, style, fail)
     }
 
 
@@ -113,9 +109,9 @@ open class HttpUrl(val path: String) {
         crossinline success: (data: T) -> Unit
     ) = launch(scope, success) {
         if (body == null) {
-            put(path, formMap, style)
+            put(path, formMap, style, fail)
         } else {
-            put(path, body!!, style)
+            put(path, body!!, style, fail)
         }
     }
 
@@ -123,12 +119,12 @@ open class HttpUrl(val path: String) {
     inline fun <reified T> launch(
         scope: CoroutineScope,
         crossinline success: (data: T) -> Unit,
-        crossinline request: suspend () -> T,
-    ) = scope.launch(exceptionHandler) {
+        crossinline request: suspend () -> T?,
+    ) = scope.launch {
         loading?.loadingMessage = msg ?: "加载中..."
         val job = if (cancelEnable) coroutineContext[Job] else null
         loading?.show(job)
-        success(request())
+        request()?.let(success)
         loading?.dismiss()
     }
 }

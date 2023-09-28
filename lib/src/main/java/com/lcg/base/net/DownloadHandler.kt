@@ -46,6 +46,8 @@ class DownloadHandler(
                         buffer.limit(len)
                         channelOut.write(buffer, bytesWritten)
                         bytesWritten += len.toLong()
+                        //
+                        if (totalLength <= 0) continue
                         val time = SystemClock.elapsedRealtime()
                         if (time - pTime > 1000) {
                             pTime = time

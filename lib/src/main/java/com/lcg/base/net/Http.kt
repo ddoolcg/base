@@ -17,7 +17,7 @@ import kotlin.coroutines.coroutineContext
  */
 object Http {
     /**OkHttpClient实例*/
-    val client = OkHttpClient()
+    var client = OkHttpClient()
 
     /**http的主地址*/
     var host = ""

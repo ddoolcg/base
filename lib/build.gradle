@@ -49,7 +49,7 @@ publishing {
             afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) } //生成aar包
             groupId = "com.lcg"
             artifactId = "base"
-            version = "0.5"
+            version = "0.6"
         }
     }
 }

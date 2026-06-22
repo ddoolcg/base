@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON
 import com.lcg.base.L
 import com.lcg.base.emptyTo
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.currentCoroutineContext
 import java.io.Serializable
 import java.lang.reflect.Type
 import java.util.Locale
@@ -19,7 +20,7 @@ abstract class JsonResponseHandler<T>(private val style: Http.Style = Http.defau
     ResponseHandler<T>() {
     @Throws(Exception::class)
     override suspend fun parse(body: String, type: Type): T {
-        L.i(coroutineContext[CoroutineName]?.name ?: "NET", body)
+        L.i(currentCoroutineContext()[CoroutineName]?.name ?: "NET", body)
         return if (style == Http.Style.JSON_WHOLE) full(body, type) else status(body, type)
     }
 

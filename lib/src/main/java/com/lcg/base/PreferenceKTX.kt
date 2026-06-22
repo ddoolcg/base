@@ -40,7 +40,7 @@ object PreferenceKTX {
 
     @JvmStatic
     fun setByte(key: String, value: ByteArray) {
-        setString(key, value.toString())
+        setString(key, value.contentToString())
     }
 
     @JvmStatic

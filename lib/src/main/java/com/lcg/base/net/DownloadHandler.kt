@@ -1,7 +1,10 @@
 package com.lcg.base.net
 
 import android.os.SystemClock
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import okhttp3.Response
 import okhttp3.ResponseBody
 import java.io.File
@@ -10,7 +13,6 @@ import java.io.RandomAccessFile
 import java.lang.reflect.Type
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
-import kotlin.coroutines.coroutineContext
 
 /**
  * 文件下载处理器
@@ -28,11 +30,14 @@ class DownloadHandler(
             val startsPoint = file.length()
             val contentLength = body!!.contentLength()
             if (code != 200 || startsPoint != contentLength) { //还有未下载的数据
-                val `in` = body!!.byteStream()
+                val `in` = body.byteStream()
                 var channelOut: FileChannel? = null
                 var randomAccessFile: RandomAccessFile? = null
                 try {
-                    randomAccessFile = RandomAccessFile(file, "rwd")
+                    randomAccessFile =
+                        withContext(Dispatchers.IO) {
+                            RandomAccessFile(file, "rwd")
+                        }
                     channelOut = randomAccessFile.channel
                     var len: Int = -1
                     var bytesWritten: Long = if (code == 200) 0 else startsPoint
@@ -41,10 +46,17 @@ class DownloadHandler(
                     val buffer = ByteBuffer.allocate(10240)
                     val array = buffer.array()
                     var pTime = 0L
-                    while (coroutineContext.isActive && `in`.read(array).also { len = it } != -1) {
+                    while (currentCoroutineContext().isActive && withContext(
+                            Dispatchers.IO
+                        ) {
+                            `in`.read(array)
+                        }.also { len = it } != -1
+                    ) {
                         buffer.position(0)
                         buffer.limit(len)
-                        channelOut.write(buffer, bytesWritten)
+                        withContext(Dispatchers.IO) {
+                            channelOut.write(buffer, bytesWritten)
+                        }
                         bytesWritten += len.toLong()
                         //
                         if (totalLength <= 0) continue
@@ -57,12 +69,14 @@ class DownloadHandler(
                 } catch (e: IOException) {
                     throw e
                 } finally {
-                    try {
-                        `in`.close()
-                        channelOut?.close()
-                        randomAccessFile?.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
+                    withContext(Dispatchers.IO) {
+                        try {
+                            `in`.close()
+                            channelOut?.close()
+                            randomAccessFile?.close()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }

@@ -3,6 +3,7 @@ package com.lcg.base.net
 import android.os.SystemClock
 import com.lcg.base.L
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -69,13 +70,13 @@ suspend fun <T> requestUnmodified(
     //建立请求
     val request = builder.build()
     L.d(
-        coroutineContext[CoroutineName]?.name ?: "NET",
+        currentCoroutineContext()[CoroutineName]?.name ?: "NET",
         "${request.method}->$url ${if (token.isEmpty()) "" else "${Token.TOKEN}=$token"}"
     )
-    coroutineContext.ensureActive()
+    currentCoroutineContext().ensureActive()
     val call = Http.client.newCall(request)
     val response = call.execute()
-    coroutineContext.ensureActive()
+    currentCoroutineContext().ensureActive()
     //获取服务器时间
     val l = try {
         val date = response.header("date")
@@ -86,7 +87,7 @@ suspend fun <T> requestUnmodified(
     }
     if (l < Http.timeDifference) Http.timeDifference = l
     //开始数据处理
-    coroutineContext.ensureActive()
+    currentCoroutineContext().ensureActive()
     return handler(response)
 }
 //endregion

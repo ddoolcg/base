@@ -29,9 +29,9 @@ public class MD5 {
 
     // 转换字节数组为16进制字串
     private static String byteToString(byte[] bByte) {
-        StringBuffer sBuffer = new StringBuffer();
-        for (int i = 0; i < bByte.length; i++) {
-            sBuffer.append(byteToArrayString(bByte[i]));
+        StringBuilder sBuffer = new StringBuilder();
+        for (byte b : bByte) {
+            sBuffer.append(byteToArrayString(b));
         }
         return sBuffer.toString();
     }
@@ -39,7 +39,7 @@ public class MD5 {
     public static String GetMD5Code(String strObj) {
         String resultString = null;
         try {
-            resultString = new String(strObj);
+            resultString = strObj;
             MessageDigest md = MessageDigest.getInstance("MD5");
             // md.digest() 该函数返回值为存放哈希值结果的byte数组
             resultString = byteToString(md.digest(strObj.getBytes()));

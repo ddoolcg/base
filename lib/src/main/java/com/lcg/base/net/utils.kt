@@ -6,6 +6,7 @@ import com.lcg.base.showToast
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
@@ -23,7 +24,7 @@ suspend fun <T> request(
     fail: ((Int, Throwable) -> Boolean)?,
     method: (Request.Builder) -> Unit
 ): T? {
-    val context = coroutineContext
+    val context = currentCoroutineContext()
     return withContext(CoroutineName("NET[${path.hashCode()}]") + Dispatchers.IO) {
         try {
             requestUnmodified(path, handler, method)

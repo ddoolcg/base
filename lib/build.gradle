@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
 
 android {
@@ -32,4 +33,23 @@ dependencies {
     api 'com.squareup.okhttp3:okhttp:4.11.0'
     api 'com.alibaba:fastjson:1.2.36'//后面的版本对data class 支持不友好
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+}
+
+publishing {
+    // 配置maven 仓库
+    repositories { RepositoryHandler handler ->
+        handler.maven {
+            url "${rootDir}/repo"
+        }
+    }
+    // 配置发布产物
+    publications { PublicationContainer publication ->
+        maven(MavenPublication) {// 容器可配置的信息 MavenPublication
+            // 依赖 bundleReleaseAar 任务，并上传其产出的aar
+            afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) } //生成aar包
+            groupId = "com.lcg"
+            artifactId = "base"
+            version = "0.5"
+        }
+    }
 }

@@ -27,7 +27,7 @@ abstract class ResponseHandler<T> {
         var body: ResponseBody? = null
         if (code in 200..299 && response.body?.also { body = it } != null) {
             val string = body!!.string()
-            body.close()
+            body!!.close()
             return parse(string, getType())
         } else {
             throw HttpStatusException(code)

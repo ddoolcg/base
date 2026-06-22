@@ -30,7 +30,7 @@ class DownloadHandler(
             val startsPoint = file.length()
             val contentLength = body!!.contentLength()
             if (code != 200 || startsPoint != contentLength) { //还有未下载的数据
-                val `in` = body.byteStream()
+                val `in` = body!!.byteStream()
                 var channelOut: FileChannel? = null
                 var randomAccessFile: RandomAccessFile? = null
                 try {

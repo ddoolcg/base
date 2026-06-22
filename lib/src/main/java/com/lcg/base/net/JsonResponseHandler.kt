@@ -63,7 +63,7 @@ abstract class JsonResponseHandler<T>(private val style: Http.Style = Http.defau
                 }
 
                 data is JSON -> { //这样做是为了适配基础类型
-                    return data.toJavaObject(type)
+                    data.toJavaObject(type)
                 }
 
                 data.javaClass.simpleName.lowercase(Locale.getDefault())

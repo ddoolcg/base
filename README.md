@@ -19,7 +19,7 @@ allprojects {
 
 ~~~gradle
 dependencies {
-    api 'com.gitee.leicg:base:0.7'
+    api 'com.github.ddoolcg:base:0.7'
 }
 ~~~
 
